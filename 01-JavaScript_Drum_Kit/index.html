@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link type="text/css" href="styles.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="content-wrapper">
+            <div class="content"></div>
+        </div>
+        <div class="toast-container"></div>
+        <audio id="player"></audio>
+    </div>
+
+<script type="text/javascript">
+    const data = [
+        {
+            html: {innerText: 'a', dataSet: {keyCode: 65}, className: 'key'},
+            audio: 'audio/LTTP_Chest.wav'
+        },
+        {
+            html: {innerText: 's', dataSet: {keyCode: 83}, className: 'key'},
+            audio: 'audio/LTTP_Error.wav'
+        },
+        {
+            html: {innerText: 'd', dataSet: {keyCode: 68}, className: 'key'},
+            audio: 'audio/LTTP_FinalDoor1.wav'
+        },
+        {
+            html: {innerText: 'f', dataSet: {keyCode: 70}, className: 'key'},
+            audio: 'audio/LTTP_FinalDoor2.wav'
+        },
+        {
+            html: {innerText: 'g', dataSet: {keyCode: 71}, className: 'key'},
+            audio: 'audio/LTTP_RefillHealth.wav'
+        },
+        {
+            html: {innerText: 'h', dataSet: {keyCode: 72}, className: 'key'},
+            audio: 'audio/LTTP_Secret.wav'
+        },
+        {
+            html: {innerText: 'j', dataSet: {keyCode: 74}, className: 'key'},
+            audio: 'audio/LTTP_Warp.wav'
+        },
+        {
+            html: {innerText: 'k', dataSet: {keyCode: 75}, className: 'key'},
+            audio: 'audio/LTTP_Water_Item.wav'
+        },
+        {
+            html: {innerText: 'l', dataSet: {keyCode: 76}, className: 'key'},
+            audio: 'audio/LTTP_World_Warp.wav'
+        },
+    ];
+
+
+    /* *** GLOBAL SECTION *** */
+    const registeredTimers = {};
+    const setTimer = (timerName, timerCallback, timeout) => {
+        registeredTimers[timerName] = setTimeout(timerCallback, timeout);
+    };
+    const getTimer = (timerName) => {
+        return registeredTimers[timerName];
+    };
+
+
+    /* *** UTILITY FUNCTIONS *** */
+    const head = (arr) => {
+        const _arr = Array.from(arr);
+        return _arr[0] || null;
+    };
+
+    const indexBy = (fn, arr) => {
+        return arr.reduce(
+            (acc, item) => {
+                return Object.assign(acc, {[fn(item)]: item});
+            },
+            {}
+        );
+    };
+
+    const removeAllChildren = (element) => {
+        Array.from(element.children).forEach(child => {
+            console.log('child: ', child);
+            element.removeChild(child);
+        });
+    };
+
+    const prop = (selector, target) => Reflect.has(target, selector) ? target[selector] : null;
+
+    const path = (selectors, target) => selectors.reduce(
+        (_target, selector) => prop(selector, _target) || null,
+        target
+    );
+
+    const setInnerText = content => element => {
+        element.innerHTML = content;
+    };
+
+    const playAudio = ({audio}) => {
+        const player = document.getElementById('player');
+        removeAllChildren(player);
+        player.src = audio;
+        player.play();
+    };
+
+    const createFeedbackKey = container => ({html: {innerText, dataSet, className}}) => {
+        const key = document.createElement('DIV');
+        Object.assign(key.dataset, dataSet);
+        key.className = className;
+        key.innerText = innerText ;
+        container.appendChild(key);
+    };
+
+    const debounce = (fn, delay, fireNow) => {
+        let timer = null;
+        return (...args) => {
+            if (fireNow) {
+                clearTimeout(timer);
+                timer = null;
+                return fn(...args);
+            }
+            if (timer) {
+                clearTimeout(timer);
+                timer = null;
+            }
+            timer = setTimeout(
+                () => {
+                    fn(...args);
+                    timer = null;
+                },
+                delay
+            );
+        };
+    };
+
+
+    /* *** APPLICATION SPECIFIC FUNCTIONS *** */
+    const clearToast = (element) => {
+        element.classList.remove('active');
+    };
+
+    const debouncedClearToast = debounce(clearToast, 500);
+
+    const addToToast = (content) => {
+        const container = head(document.getElementsByClassName('toast-container'));
+        setInnerText(content)(container);
+        container.classList.add('active');
+        debouncedClearToast(container);
+    };
+
+    const clearActiveKey = debounce((element) => element.classList.remove('active'), 500);
+
+    const activateKey = keyCode => {
+        const query = head(document.body.querySelectorAll(`[data-key-code="${keyCode}"]`));
+        query.classList.add('active');
+        setTimeout(() => query.classList.remove('active'), 500);
+    };
+
+    const functionRegistry = new Map();
+    const registerFunction = (index, fn) => {
+        functionRegistry.set(index, fn);
+    };
+    const triggerFunction = (index) => {
+        return functionRegistry.has(index) ? functionRegistry.get(index)() : null;
+    };
+
+    document.body.addEventListener('keydown', (e) => {
+        addToToast(`key code: ${e.keyCode}`);
+        triggerFunction(e.keyCode);
+    });
+
+    data.map(item => {
+        createFeedbackKey(head(document.getElementsByClassName('content')))(item);
+        const keyCode = path(['html', 'dataSet', 'keyCode'], item);
+        registerFunction(
+            keyCode,
+            () => {
+                playAudio(item);
+                activateKey(keyCode);
+            }
+        );
+    });
+
+</script>
+</body>
+</html>
