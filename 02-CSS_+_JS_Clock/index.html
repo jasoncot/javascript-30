@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSS + JS Clock</title>
+    <style type="text/css">
+        :root {
+            --clock-face-size: 200px;
+            --clock-color: #FFFFFF;
+            --clock-boarder-size: 10px;
+            --hand-thickness: 3px;
+            --second-hand-color: #FFFFFF;
+            --minute-hand-color: #FFFFFF;
+            --hour-hand-color: #FFFFFF;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            clear: both;
+        }
+
+        body {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+        }
+
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: space-around;
+            flex-grow: 1;
+        }
+
+        .app {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+            background-color: dodgerblue;
+        }
+
+        .clock-face {
+            position: relative;
+            border: solid var(--clock-color) 10px;
+            border-radius: calc(0.75 * var(--clock-face-size));
+            width: var(--clock-face-size);
+            height: var(--clock-face-size);
+            box-sizing: content-box;
+        }
+
+        .hand-container {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .no-transitions {
+            transition: unset;
+        }
+
+        .minute {
+            transform: rotate(0deg);
+        }
+        .hour {
+            transform: rotate(0deg);
+        }
+        .second {
+            transform: rotate(0deg);
+        }
+
+
+        .hand {
+            width: var(--hand-thickness);
+            min-width: 2px;
+            border: solid var(--clock-color) var(--hand-thickness);
+            border-radius: 0 0 var(--hand-thickness) var(--hand-thickness);
+            position: absolute;
+            top: 2px;
+            bottom: 45%;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .second > .hand {
+            border: solid var(--second-hand-color) calc(var(--hand-thickness) * 0.1);
+            background-color: var(--second-hand-color);
+        }
+        .minute > .hand {
+            border-color: var(--minute-hand-color);
+        }
+        .hour > .hand {
+            border-color: var(--hour-hand-color);
+            top: 15%;
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+    <div class="app">
+        <div class="clock-wrapper">
+            <div class="clock-face">
+                <div class="hand-container hour">
+                    <div class="hand"></div>
+                </div>
+                <div class="hand-container minute">
+                    <div class="hand"></div>
+                </div>
+                <div class="hand-container second">
+                    <div class="hand"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        const head = arr => Array.from(arr)[0];
+
+        const getCurrentTime = () => new Date();
+        const getSecondsFromDate = date => date.getSeconds();
+        const getMinutesFromDate = date => date.getMinutes();
+        const getHoursFromDate = date => date.getHours();
+
+        const getFraction = whole => partial => partial / whole;
+
+        const getDegreesForSeconds = date => Math.floor(360 * getFraction(60)(getSecondsFromDate(date)));
+        const getDegreesForMinutes = date => Math.floor(360 * getFraction(60)(getMinutesFromDate(date)));
+        const getDegreesForHours = date => 360 * getFraction(12)(getHoursFromDate(date) % 12);
+
+        const updateAllHands = () => {
+            const minuteHand = head(document.getElementsByClassName('minute'));
+            const hourHand = head(document.getElementsByClassName('hour'));
+            const secondHand = head(document.getElementsByClassName('second'));
+            const now = getCurrentTime();
+
+            secondHand.style.transform = `rotate(${getDegreesForSeconds(now)}deg)`;
+            minuteHand.style.transform = `rotate(${getDegreesForMinutes(now)}deg)`;
+            hourHand.style.transform = `rotate(${getDegreesForHours(now)}deg)`;
+        };
+        setInterval(updateAllHands, 1000);
+    </script>
+
+</div>
+</body>
+</html>
