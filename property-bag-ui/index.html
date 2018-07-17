@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple property bag UI</title>
+  <style type="text/css">
+    html, body {
+      display: block;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .property-bag-wrapper {
+      border: solid black 1px;
+    }
+
+    .property-entry {
+      border: solid green 1px;
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+    }
+
+    .property-label, label.label {
+      display: flex;
+      flex: 0 0 10em;
+      background-color: #00000050;
+    }
+
+    .property-inner {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .property-array-row {
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+    }
+
+    .property-object .container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      background-color: #ac3;
+    }
+
+    .property-object .container .contents {
+      display: flex;
+      flex: 1 0 auto;
+      background-color: #23232323;
+      padding: 10px;
+      flex-direction: column;
+    }
+
+    .property-object .container .controls {
+      display: flex;
+      flex: 0 0 10em;
+      background-color: red;
+    }
+
+    .entry {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .entry > .type {
+      flex: 0 0 7em;
+      border: solid yellow: 2px;
+    }
+
+    .entry > .key-label {
+      flex: 0 0 10em;
+    }
+
+  </style>
+</head>
+<body>
+<div class="property-bag-wrapper">
+  <div class="property-string property-entry">
+    <label for="property-entry-0" class="property-label">string-label</label>
+    <input type="text" id="property-entry-0" placeholder="string inputs" />
+  </div>
+
+  <div class="property-integer property-entry">
+    <label for="integer-input" class="property-label">integer-label</label>
+    <input type="number" name="integer-input" id="integer-input" placeholder="0" />
+  </div>
+
+  <div class="property-float property-entry">
+    <label for="float-input" class="property-label">float-label</label>
+    <input type="number" name="float-input" id="float-input" placeholder="0.0" />
+  </div>
+
+  <div class="property-array property-entry">
+    <label class="property-label">array-label</label>
+    <div class="property-inner">
+      <div class="property-array-row">
+        <div class="property-array-type">
+          <select name="property-array-select-0">
+            <option value="NULL">Select One</option>
+            <option value="string">String</option>
+            <option value="integer">Integer</option>
+            <option value="float">Float</option>
+            <option value="boolean">Boolean</option>
+            <option value="array">Array</option>
+            <option value="object">Object</option>
+          </select>
+        </div>
+        <div class="property-array-input empty"></div>
+        <div class="property-array-input string"></div>
+        <div class="property-array-input integer"></div>
+        <div class="property-array-input float">
+          <input type="number" placeholder="0.0" />
+        </div>
+        <div class="property-array-input boolean">
+          <input type="checkbox" checked="false" name="row-0" />
+        </div>
+        <div class="property-array-input array">NESTING GOES HERE</div>
+        <div class="property-array-input object">NESTING GOES HERE</div>
+          <span class="property-array-0-controls">
+            <button class="control remove">Remove</button>
+          </span>
+      </div>
+      <div class="array-control">
+          <span class="property-array-controls">
+            <button class="control add">Add</button>
+          </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="property-object property-entry">
+    <label class="label">object-input</label>
+    <div class="container">
+      <div class="contents">
+        <div class="entry">
+          <div
+              id="object-0-key-0-type"
+              class="type"
+              >
+            STRING
+          </div>
+          <div
+              id="object-0-key-0-key"
+              class="key-label"
+              >
+            object key (sub label)
+          </div>
+          <div
+              id="object-0-key-0-value"
+              class="value"
+              >
+            object value here, could be any type...
+          </div>
+        </div>
+      </div>
+      <div class="controls">
+          <span class="property-object-controls">
+            <button class="control add">Add</button>
+          </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/html" data-role="template" id="propertyObject">
+  <div class="property-entry property-object">
+    <label class="label">{object-label}</label>
+    <div class="container">
+      <div class="contents">
+        <div
+            id="object-0-key-0-type-template"
+            class="property-object-type-0"
+            >
+          a type selection?
+        </div>
+        <div
+            id="object-0-key-0-key-template"
+            class="property-object-key-0"
+            >
+          object key (sub label)
+        </div>
+        <div
+            id="object-0-key-0-value-template"
+            class="property-object-value-0"
+            >
+          object value here, could be any type...
+        </div>
+      </div>
+      <div class="controls">
+          <span class="property-object-controls">
+            <button class="control add">Add</button>
+          </span>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" data-role="template" id="typeSelect">
+  <select name="property-array-select-0">
+    <option value="NULL">Select One</option>
+    <option value="string">String</option>
+    <option value="integer">Integer</option>
+    <option value="float">Float</option>
+    <option value="boolean">Boolean</option>
+    <option value="array">Array</option>
+    <option value="object">Object</option>
+  </select>
+</script>
+
+<script type="text/javascript" src="scripts/index.js"></script>
+<script type="text/javascript">
+  const {fromPairs, lcFirst, toCamelCase} = propertyBag;
+
+  const buildTemplateRef = function () {
+    const templates = document.querySelectorAll('script')
+    return fromPairs(
+        Array.from(templates)
+            .filter(function (template) {
+              const {role} = template.dataset;
+              return role === 'template';
+            })
+            .map(function (template) {
+              return [lcFirst(toCamelCase(template.id)), template.innerHTML];
+            })
+    );
+  };
+
+  console.log(buildTemplateRef());
+</script>
+</body>
+</html>
